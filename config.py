@@ -5,13 +5,13 @@ tg_phone: str = <phone number in international format>
 tg_pass: str = <telegram password>
 
 # Proxy data (keep it empty if not necessary)
-proxy_ip = ''
-proxy_port = 0
-proxy_pass = ''
+proxy_ip: str = ''
+proxy_port: int = 0
+proxy_pass: str = ''
 
 # OpenWeather API
-openweather_api_key = <OpenWeatherMap API key>
-openweather_api_url = "http://api.openweathermap.org/data/2.5/weather"
-openweather_api_cityid = 524901  # for Moscow (for other cities look at the site)
-openweather_api_image_url = "http://openweathermap.org/img/wn/{}@2x.png"
+openweather_api_key: str = <OpenWeatherMap API key>
+openweather_api_url: str = "http://api.openweathermap.org/data/2.5/weather"
+openweather_api_cityid: int = 524901  # for Moscow (for other cities look at the site)
+openweather_api_image_url: str = "http://openweathermap.org/img/wn/{}@2x.png"
 
