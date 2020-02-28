@@ -25,6 +25,8 @@ if __name__ == "__main__":
         api_token=config.openweather_api_key,
         api_url=config.openweather_api_url,
         image_url=config.openweather_api_image_url,
+        text_color = config.txt_color,
+        bg_color = config.bg_color,
     )
 
     proxy = None if not all((config.proxy_ip, config.proxy_port, config.proxy_pass)) \
@@ -51,6 +53,7 @@ if __name__ == "__main__":
     )
     scheduler.add_job(
         generator.update_weather_data,
+        args=(config.openweather_api_cityid,),
         trigger='cron',
         minute='*/10',
         hour='*',

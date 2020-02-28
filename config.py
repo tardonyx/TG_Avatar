@@ -15,3 +15,6 @@ openweather_api_url: str = "http://api.openweathermap.org/data/2.5/weather"
 openweather_api_cityid: int = 524901  # for Moscow (for other cities look at the site)
 openweather_api_image_url: str = "http://openweathermap.org/img/wn/{}@2x.png"
 
+# Customization
+bg_color = (255, 255, 255)
+txt_color = (0, 0, 0)

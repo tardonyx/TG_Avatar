@@ -18,10 +18,15 @@ class AvatarGenerator(object):
     __last_temperature: str = "270"
     __last_icon: str = "04n"
 
-    def __init__(self, api_token, api_url, image_url):
+    __text_color = (0, 0, 0)
+    __bg_color = (255, 255, 255)
+
+    def __init__(self, api_token, api_url, image_url, text_color, bg_color):
         self.__api_token = api_token
         self.__api_url = api_url
         self.__image_url = image_url
+        self.__text_color = text_color
+        self.__bg_color = bg_color
 
     def update_weather_data(self, city_id=524901):
         payload = {
@@ -62,9 +67,9 @@ class AvatarGenerator(object):
             result = "+" + result
         return result
 
-    def generate(self, avatar_name="Avatar.png", bg_color=(255, 255, 255), text_color=(0, 0, 0)):
+    def generate(self, avatar_name="Avatar.png"):
         # create new background image
-        bg = Image.new("RGBA", (200, 200), bg_color+(255,))
+        bg = Image.new("RGBA", (200, 200), self.__bg_color+(255,))
         canvas = ImageDraw.Draw(bg)
         # load weather icon
         icon_path = os.path.join("API_Icons", self.__last_icon+".png")
@@ -79,8 +84,8 @@ class AvatarGenerator(object):
         # blend images
         bg.paste(icon, (50, 50), icon)
         # draw text on canvas
-        canvas.text((35, 20), time, font=font_time, fill=text_color)
-        canvas.text((65, 130), temperature, font=font_temperature, fill=text_color)
+        canvas.text((35, 20), time, font=font_time, fill=self.__text_color)
+        canvas.text((65, 130), temperature, font=font_temperature, fill=self.__text_color)
         # save image
         bg.save(avatar_name)
         return os.path.abspath(avatar_name)
@@ -93,8 +98,4 @@ if __name__ == "__main__":
         api_url=config.openweather_api_url,
         image_url=config.openweather_api_image_url,
     )
-    generator.generate(
-        bg_color=(100, 100, 255),
-        text_color=(0, 0, 0),
-    )
-
+    generator.generate()
