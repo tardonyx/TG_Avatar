@@ -42,7 +42,6 @@ if __name__ == "__main__":
         phone=lambda: config.tg_phone,
         password=lambda: config.tg_pass,
     )
-    client.send_message('me', "TEST")
 
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
