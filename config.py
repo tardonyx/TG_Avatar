@@ -2,7 +2,7 @@
 telegram_api_id = 0  # Telegram API id
 telegram_api_hash = "<your Telegram API hash>"
 tg_phone = "<your phone number>"
-tg_pass = "your Telegram password"
+tg_pass = "<your Telegram password>"
 
 # Proxy data (keep it empty if not necessary)
 proxy_ip = ''
