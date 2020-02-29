@@ -5,6 +5,7 @@ from AvatarGenerator import AvatarGenerator
 import asyncio
 import config
 import socks
+from datetime import datetime
 
 
 import logging
@@ -47,12 +48,14 @@ if __name__ == "__main__":
     scheduler.add_job(
         change_avatar,
         args=(client, generator),
+        next_run_time=datetime.now(),
         trigger='cron',
         minute='*',
     )
     scheduler.add_job(
         generator.update_weather_data,
         args=(config.openweather_api_cityid,),
+        next_run_time=datetime.now(),
         trigger='cron',
         minute='*/10',
         hour='*',
