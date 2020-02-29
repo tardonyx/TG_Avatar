@@ -5,6 +5,8 @@
 This script updates you avatar in Telegram every minute with adding time and weather data (weather icon and temperature) on it using Telegram API. Weather data getting from OpenWeatherMap API and updates every 10 minutes.
 If all works fine, you will see something like that:
 ![Avatar Example](Avatar.png)
+Or like that if weather data is not available:
+![Avatar Example No Weather](Avatar_wo_weather.png)
 
 ## Getting Started ##
 
@@ -37,6 +39,7 @@ Note that values must be tuples of three ints (RGB format).
 * `main.py` - main file, you must launch it;
 * `config.py` - settings that contains Telegram API, OpenWeatherMap API and customization constants;
 * `Avatar.png` - example of avatar image;
+* `Avatar_wo_weather.png` - example of avatar image if weather data is not available;
 * `requirements.txt` - list of requirement python modules;
 * `OpenSans-Regular.ttf` - font file;
 * `API_Icons` - folder there OpenWeatherMap API icons collects;

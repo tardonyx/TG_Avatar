@@ -5,7 +5,7 @@ import config
 import os
 import aiohttp
 from datetime import datetime as dt
-from typing import Union
+from typing import Union, Tuple
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -15,11 +15,11 @@ class AvatarGenerator(object):
     __api_url: str
     __image_url: str
 
-    __last_temperature: str = "270"
-    __last_icon: str = "04n"
+    __last_temperature: Union[str, None] = None
+    __last_icon: Union[str, None] = None
 
-    __text_color: tuple
-    __bg_color: tuple
+    __text_color: Tuple[int]
+    __bg_color: Tuple[int]
 
     def __init__(self, api_token, api_url, image_url, text_color=(0, 0, 0), bg_color=(255, 255, 255)):
         self.__api_token = api_token
@@ -65,30 +65,26 @@ class AvatarGenerator(object):
         t_kelvin = int(t_kelvin)
         t_celsius = t_kelvin-273
         result = u"{} C".format(str(t_celsius))
-        if t_celsius > 0:
+        if t_celsius >= 0:
             result = "+" + result
         return result
 
     def generate(self, avatar_name="Avatar.png"):
-        # create new background image
         bg = Image.new("RGBA", (200, 200), self.__bg_color+(255,))
         canvas = ImageDraw.Draw(bg)
-        # load weather icon
-        icon_path = os.path.join("API_Icons", self.__last_icon+".png")
-        icon = Image.open(icon_path, "r")
-        # load font
-        font_time = ImageFont.truetype("OpenSans-Regular.ttf", 50)
-        font_temperature = ImageFont.truetype("OpenSans-Regular.ttf", 30)
-        # set temperature string
-        temperature = self.__get_celsius_from_kelvin(self.__last_temperature)
-        # set time into "hh:mm" format
         time = "{:0>2d}:{:0>2d}".format(dt.now().hour, dt.now().minute)
-        # blend images
-        bg.paste(icon, (50, 55), icon)
-        # draw text on canvas
-        canvas.text((35, 20), time, font=font_time, fill=self.__text_color)
-        canvas.text((65, 130), temperature, font=font_temperature, fill=self.__text_color)
-        # save image
+        if all((self.__last_icon, self.__last_temperature)):
+            icon_path = os.path.join("API_Icons", self.__last_icon+".png")
+            icon = Image.open(icon_path, "r")
+            font_temperature = ImageFont.truetype("OpenSans-Regular.ttf", 30)
+            font_time = ImageFont.truetype("OpenSans-Regular.ttf", 50)
+            temperature = self.__get_celsius_from_kelvin(self.__last_temperature)
+            bg.paste(icon, (50, 55), icon)
+            canvas.text((35, 20), time, font=font_time, fill=self.__text_color)
+            canvas.text((65, 130), temperature, font=font_temperature, fill=self.__text_color)
+        else:
+            font_time = ImageFont.truetype("OpenSans-Regular.ttf", 60)
+            canvas.text((20, 55), time, font=font_time, fill=self.__text_color)
         bg.save(avatar_name)
         return os.path.abspath(avatar_name)
 
