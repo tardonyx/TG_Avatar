@@ -2,16 +2,11 @@ from telethon import TelegramClient#, sync
 from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from AvatarGenerator import AvatarGenerator
+import sys
 import asyncio
 import config
 import socks
 from datetime import datetime
-
-
-import logging
-
-logging.basicConfig()
-logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
 
 async def change_avatar(tg_client, avatar_generator):
@@ -22,12 +17,18 @@ async def change_avatar(tg_client, avatar_generator):
 
 if __name__ == "__main__":
 
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--debug":
+            import logging
+            logging.basicConfig()
+            logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+
     generator = AvatarGenerator(
         api_token=config.openweather_api_key,
         api_url=config.openweather_api_url,
         image_url=config.openweather_api_image_url,
-        text_color = config.txt_color,
-        bg_color = config.bg_color,
+        text_color=config.txt_color,
+        bg_color=config.bg_color,
     )
 
     proxy = None if not all((config.proxy_ip, config.proxy_port, config.proxy_pass)) \

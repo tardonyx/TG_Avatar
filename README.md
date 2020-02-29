@@ -37,6 +37,16 @@ To instaling requirement modules execute this commant in shell while located in 
 You can set text and background color by changing corresponds values in `config.py` file in block "customization".
 Note that values must be tuples of three ints (RGB format).
 
+## Launching ##
+
+Execute in shell next command (while located in TG_Avatar base directory):
+
+    python3 main.py
+    
+If you want use debug mode, you should add `--debug` flag:
+
+    python3 main.py --debug
+
 ## Files and folders description ##
 
 * `AvatarGenerator.py` - basic class for requesting weather data and generate avatar image;
