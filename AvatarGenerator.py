@@ -39,8 +39,8 @@ class AvatarGenerator(object):
     __api_url: str      # Variable which stores OpenWeatherMap API url
     __image_url: str    # Variable which stores OpenWeatherMap API url pattern to load weather icon
 
-    __last_temperature: Union[str, None] = None     # Last loaded temperature from OpenWeatherMap API or None
-    __last_icon: Union[str, None] = None            # Last loaded weather icon name from OpenWeatherMap API or None
+    __last_temperature: Optional[str] = None    # Last loaded temperature from OpenWeatherMap API or None
+    __last_icon: Optional[str] = None           # Last loaded weather icon name from OpenWeatherMap API or None
 
     __text_color: Tuple[int]    # Text color (must be a tuple of three ints from 0 to 255 - RGB format)
     __bg_color: Tuple[int]      # Background color (must be a tuple of three ints from 0 to 255 - RGB format)
