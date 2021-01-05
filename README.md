@@ -42,10 +42,6 @@ Note that values must be tuples of three ints (RGB format).
 Execute in shell next command (while located in TG_Avatar base directory):
 
     python3 main.py
-    
-If you want use debug mode, you should add `--debug` flag:
-
-    python3 main.py --debug
 
 ## Launching (with Docker) ##
 

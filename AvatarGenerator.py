@@ -5,7 +5,6 @@ import aiohttp
 from datetime import datetime as dt
 from typing import Union, Tuple, Optional
 from PIL import Image, ImageDraw, ImageFont
-from environment import *
 
 
 WEATHER_ICONS_FOLDER_NAME = "API_Icons"  # A folder name where weather icons will be collecting.
@@ -45,11 +44,12 @@ class AvatarGenerator(object):
     __text_color: Tuple[int]    # Text color (must be a tuple of three ints from 0 to 255 - RGB format)
     __bg_color: Tuple[int]      # Background color (must be a tuple of three ints from 0 to 255 - RGB format)
 
-    def __init__(self, api_token, api_url, image_url, text_color=(0, 0, 0), bg_color=(255, 255, 255)):
+    def __init__(self, api_token, api_url, image_url, logger, text_color=(0, 0, 0), bg_color=(255, 255, 255)):
         """Inits AvatarGenerator with necessary API information and colors for text and background."""
         self.__api_token = api_token
         self.__api_url = api_url
         self.__image_url = image_url
+        self.__logger = logger
         self.__text_color = text_color
         self.__bg_color = bg_color
 
@@ -72,11 +72,16 @@ class AvatarGenerator(object):
             "id": city_id,
             "appid": self.__api_token,
         }
+        self.__logger.info(f"Updating weather information with payload: {payload}")
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 url=self.__api_url,
                 params=payload,
             ) as response:
+                self.__logger.info(
+                    f"New response from weather service. "
+                    f"Status: {response.status}, body: {await response.json()}"
+                )
                 if response.status == 200:
                     # if request is success updating weather data with actual
                     data = await response.json(encoding="utf-8")
@@ -89,11 +94,12 @@ class AvatarGenerator(object):
                     self.__last_icon = None
         return self.__last_temperature, self.__last_icon
 
-    @staticmethod
-    def __weather_image_exists(image_name: str) -> bool:
+    def __weather_image_exists(self, image_name: str) -> bool:
         """Check if weather image icon is exists in folder."""
         img_path = os.path.join(os.getcwd(), WEATHER_ICONS_FOLDER_NAME, image_name+".png")
-        return os.path.exists(img_path)
+        exists = os.path.exists(img_path)
+        self.__logger.info(f"Image with name {image_name} existing: {exists}")
+        return exists
 
     async def __check_weather_image(self, image_name: str) -> None:
         """
@@ -108,14 +114,18 @@ class AvatarGenerator(object):
         """
         if not self.__weather_image_exists(image_name):
             url = self.__image_url.format(image_name)
+            self.__logger.info(f"Loading image with name: {image_name}...")
             async with aiohttp.ClientSession() as session:
                 async with session.get(url=url) as response:
+                    self.__logger.info(f"Getting response with status: {response.status}")
                     if response.status == 200:
+                        data = await response.read()
                         with open(os.path.join(os.getcwd(), WEATHER_ICONS_FOLDER_NAME, image_name+".png"), "wb") as f:
-                            f.write(await response.read())
+                            f.write(data)
+                        self.__logger.info(f"Saving new image ({len(data)} bytes)")
                     else:
                         self.__last_icon = None
-        return None
+        return
 
     @staticmethod
     def __get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -150,7 +160,9 @@ class AvatarGenerator(object):
         """
         bg = Image.new("RGBA", (200, 200), self.__bg_color+(255,))
         canvas = ImageDraw.Draw(bg)
-        time = "{:0>2d}:{:0>2d}".format(dt.now().hour, dt.now().minute)
+        current_time = dt.now()
+        self.__logger.info(f"Creating new avatar with name {avatar_name}...")
+        time = "{:0>2d}:{:0>2d}".format(current_time.hour, current_time.minute)
         if all((self.__last_icon, self.__last_temperature)):
             icon_path = os.path.join("API_Icons", self.__last_icon+".png")
             icon = Image.open(icon_path, "r")
@@ -165,15 +177,3 @@ class AvatarGenerator(object):
             canvas.text((20, 55), time, font=font_time, fill=self.__text_color)
         bg.save(avatar_name)
         return os.path.abspath(avatar_name)
-
-
-if __name__ == "__main__":
-
-    generator = AvatarGenerator(
-        api_token=OPENWEATHER_API_KEY,
-        api_url=OPENWEATHER_API_URL,
-        image_url=OPENWEATHER_API_IMAGE_URL,
-        text_color=TEXT_COLOR,
-        bg_color=BACKGROUND_COLOR,
-    )
-    generator.generate()

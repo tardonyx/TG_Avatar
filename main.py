@@ -5,6 +5,7 @@ from AvatarGenerator import AvatarGenerator
 from datetime import datetime
 from environment import *
 import sys
+import logging
 import asyncio
 import socks
 
@@ -23,23 +24,25 @@ async def change_avatar(tg_client: TelegramClient, avatar_generator: AvatarGener
     await tg_client(DeletePhotosRequest(await tg_client.get_profile_photos('me')))  # deleting Telegram avatar
     file = await tg_client.upload_file(avatar_generator.generate())  # generating and load a new Telegram avatar
     await tg_client(UploadProfilePhotoRequest(file))  # updating Telegram avatar
-    return None
+    return
 
 
 if __name__ == "__main__":
 
-    # check if script launched with debug mode flag
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "--debug":
-            import logging
-            logging.basicConfig()
-            logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+    # logging settings
+    server_logger = logging.getLogger(__name__)
+    logger_format = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    server_logger.setLevel(logging.INFO)
+    logging_handler = logging.StreamHandler(sys.stdout)
+    logging_handler.setFormatter(logger_format)
+    server_logger.addHandler(logging_handler)
 
     # creating an instance of AvatarGenerator class with necessary information
     generator = AvatarGenerator(
         api_token=OPENWEATHER_API_KEY,
         api_url=OPENWEATHER_API_URL,
         image_url=OPENWEATHER_API_IMAGE_URL,
+        logger=server_logger,
         text_color=TEXT_COLOR,
         bg_color=BACKGROUND_COLOR,
     )
