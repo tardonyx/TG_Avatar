@@ -8,7 +8,7 @@ TELEGRAM_PASSWORD = environ.get("TG_AVATAR_TELEGRAM_PASSWORD", '')
 
 # Proxy data (keep it empty if not necessary)
 PROXY_IP = environ.get("TG_AVATAR_PROXY_IP", '')
-PROXY_PORT = int(environ.get("TG_AVATAR_PROXY_PORT", '0'))
+PROXY_PORT = int(environ.get("TG_AVATAR_PROXY_PORT", '0') or '0')
 PROXY_PASSWORD = environ.get("TG_AVATAR_PROXY_PASSWORD", '')
 
 # OpenWeather API
