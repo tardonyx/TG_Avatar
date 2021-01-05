@@ -2,11 +2,11 @@ from telethon import TelegramClient
 from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from AvatarGenerator import AvatarGenerator
+from datetime import datetime
+from environment import *
 import sys
 import asyncio
-import config
 import socks
-from datetime import datetime
 
 
 async def change_avatar(tg_client: TelegramClient, avatar_generator: AvatarGenerator) -> None:
@@ -37,28 +37,28 @@ if __name__ == "__main__":
 
     # creating an instance of AvatarGenerator class with necessary information
     generator = AvatarGenerator(
-        api_token=config.openweather_api_key,
-        api_url=config.openweather_api_url,
-        image_url=config.openweather_api_image_url,
-        text_color=config.txt_color,
-        bg_color=config.bg_color,
+        api_token=OPENWEATHER_API_KEY,
+        api_url=OPENWEATHER_API_URL,
+        image_url=OPENWEATHER_API_IMAGE_URL,
+        text_color=TEXT_COLOR,
+        bg_color=BACKGROUND_COLOR,
     )
 
     # loading proxy info from config file or setting None if proxy info is empty
-    proxy = None if not all((config.proxy_ip, config.proxy_port, config.proxy_pass)) \
-        else (socks.SOCKS5, config.proxy_ip, config.proxy_port, True, config.proxy_pass, config.proxy_pass)
+    proxy = None if not all((PROXY_IP, PROXY_PORT, PROXY_PASSWORD)) \
+        else (socks.SOCKS5, PROXY_IP, PROXY_PORT, True, PROXY_PASSWORD, PROXY_PASSWORD)
 
     # creating an instance of TelegramClient class
     client = TelegramClient(
         'TG_Avatar',                        # session name
-        api_id=config.telegram_api_id,      # Telegram API ID
-        api_hash=config.telegram_api_hash,  # Telegram API hash
+        api_id=TELEGRAM_API_ID,             # Telegram API ID
+        api_hash=TELEGRAM_API_HASH,         # Telegram API hash
         proxy=proxy,                        # Proxy data
     )
     # starting a session
     client.start(
-        phone=lambda: config.tg_phone,      # Telegram phone number (must be callable)
-        password=lambda: config.tg_pass,    # Telegram password (must be callable)
+        phone=lambda: TELEGRAM_PHONE,        # Telegram phone number (must be callable)
+        password=lambda: TELEGRAM_PASSWORD,  # Telegram password (must be callable)
     )
 
     # creating task scheduler instance
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # adding a job which updating weather data every beginning of a tenth minute (and starts immediately)
     scheduler.add_job(
         generator.update_weather_data,
-        args=(config.openweather_api_cityid,),
+        args=(OPENWEATHER_API_CITYID,),
         next_run_time=datetime.now(),
         trigger='cron',
         minute='*/10',

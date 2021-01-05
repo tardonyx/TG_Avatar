@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import config
 import os
 import aiohttp
 from datetime import datetime as dt
 from typing import Union, Tuple, Optional
 from PIL import Image, ImageDraw, ImageFont
+from environment import *
 
 
 WEATHER_ICONS_FOLDER_NAME = "API_Icons"  # A folder name where weather icons will be collecting.
@@ -170,10 +170,10 @@ class AvatarGenerator(object):
 if __name__ == "__main__":
 
     generator = AvatarGenerator(
-        api_token=config.openweather_api_key,
-        api_url=config.openweather_api_url,
-        image_url=config.openweather_api_image_url,
-        text_color=config.txt_color,
-        bg_color=config.bg_color,
+        api_token=OPENWEATHER_API_KEY,
+        api_url=OPENWEATHER_API_URL,
+        image_url=OPENWEATHER_API_IMAGE_URL,
+        text_color=TEXT_COLOR,
+        bg_color=BACKGROUND_COLOR,
     )
     generator.generate()
