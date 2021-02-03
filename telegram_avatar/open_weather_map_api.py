@@ -1,5 +1,7 @@
 from typing import Tuple
 from logging import Logger
+import os
+
 from aiohttp import ClientSession, ClientError
 from pydantic import ValidationError
 from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME
@@ -7,7 +9,6 @@ from telegram_avatar.data_classes import WeatherData, OpenWeatherMap
 from telegram_avatar.exceptions import (
     WeatherDataDownloadError, ImageDownloadError,
 )
-import os
 
 
 class OpenWeatherMapAPI:

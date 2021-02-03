@@ -1,18 +1,21 @@
+import asyncio
+import logging
+import os
+import socks
+import sys
+from datetime import datetime
+
 from telethon import TelegramClient
 from telethon.tl.functions.photos import (
     UploadProfilePhotoRequest, DeletePhotosRequest
 )
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
+
 from telegram_avatar.avatar_generator import AvatarGenerator
 from telegram_avatar.open_weather_map_api import OpenWeatherMapAPI
 from telegram_avatar.data_classes import WeatherData
 from telegram_avatar.config import *
-import logging
-import asyncio
-import socks
-import sys
-import os
 
 
 async def change_avatar(

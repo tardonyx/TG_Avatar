@@ -3,8 +3,9 @@
 import os
 from datetime import datetime
 from typing import Union, Tuple
-from PIL import Image, ImageDraw, ImageFont
 from logging import Logger
+
+from PIL import Image, ImageDraw, ImageFont
 from telegram_avatar.data_classes import WeatherData
 from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME, FONT_FILE_NAME
 
