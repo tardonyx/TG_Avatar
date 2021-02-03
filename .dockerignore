@@ -1,3 +1,5 @@
 *.png
 *.md
+*.session
+*.session-journal
 venv/
