@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from pydantic import BaseModel
-from typing import Optional, List
+from pydantic import BaseModel, Field
+from typing import Optional, List, Union
 
 
 @dataclass
@@ -73,10 +73,26 @@ class OpenWeatherMapSys(BaseModel):
     """
     type: int
     id: int
-    message: float
+    message: Optional[float] = None
     country: str
     sunrise: int
     sunset: int
+
+
+class OpenWeatherMapRain(BaseModel):
+    """
+    Model which represents 'rain' field in OpenWeatherMap API response.
+    """
+    _1h: Union[int, str, float] = Field(alias="1h")
+    _3h: Union[int, str, float] = Field(alias="3h")
+
+
+class OpenWeatherMapSnow(BaseModel):
+    """
+    Model which represents 'snow' field in OpenWeatherMap API response.
+    """
+    _1h: Union[int, str, float] = Field(alias="1h")
+    _3h: Union[int, str, float] = Field(alias="3h")
 
 
 class OpenWeatherMap(BaseModel):
@@ -88,10 +104,12 @@ class OpenWeatherMap(BaseModel):
     base: str
     main: OpenWeatherMapMain
     visibility: int
-    wind: OpenWeatherMapWind
-    clouds: OpeWeatherMapClouds
+    wind: Optional[OpenWeatherMapWind] = None
+    clouds: Optional[OpeWeatherMapClouds] = None
+    rain: Optional[OpenWeatherMapRain] = None
+    show: Optional[OpenWeatherMapSnow] = None
     dt: int
-    sys: OpenWeatherMapSys
+    sys: Optional[OpenWeatherMapSys] = None
     timezone: int
     id: int
     name: str
