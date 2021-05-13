@@ -3,4 +3,4 @@ Telethon==1.18.2
 APScheduler==3.6.3
 aiohttp==3.7.3
 PySocks==1.7.1
-pydantic==1.7.3
+pydantic==1.7.4
