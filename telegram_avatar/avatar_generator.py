@@ -2,10 +2,10 @@
 
 import os
 from datetime import datetime
-from typing import Union, Tuple
 from logging import Logger
-
 from PIL import Image, ImageDraw, ImageFont
+from typing import Union, Tuple
+
 from telegram_avatar.data_classes import WeatherData
 from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME, FONT_FILE_NAME
 
@@ -13,7 +13,7 @@ from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME, FONT_FILE_NAME
 class AvatarGenerator:
     """
     Class that generates avatar with current time and weather data
-    (if it available).
+    (if it is available).
     """
 
     def __init__(
@@ -31,6 +31,7 @@ class AvatarGenerator:
             text_color: text color in RGB format.
             bg_color: background color in RGB format.
         """
+
         self._weather_data = weather_data
         self._logger = logger
         self._text_color = text_color
@@ -38,7 +39,6 @@ class AvatarGenerator:
         self._font_temperature = ImageFont.truetype(FONT_FILE_NAME, 30)
         self._font_time = ImageFont.truetype(FONT_FILE_NAME, 50)
         self._font_time_larger = ImageFont.truetype(FONT_FILE_NAME, 60)
-        return
 
     @staticmethod
     def _get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -50,11 +50,13 @@ class AvatarGenerator:
         Returns:
             string with formatted temperature in Celsius scale.
         """
+
         t_kelvin = int(t_kelvin)
         t_celsius = t_kelvin-273
         result = u"{} C".format(str(t_celsius))
         if t_celsius >= 0:
             result = "+" + result
+
         return result
 
     def generate(self, avatar_name: str = "Avatar.png") -> os.path:
@@ -67,6 +69,7 @@ class AvatarGenerator:
         Returns:
             os.path object - absolute path to the generated avatar image.
         """
+
         # Create background
         bg = Image.new(
             mode="RGBA",
@@ -118,4 +121,5 @@ class AvatarGenerator:
             )
         # Saving new avatar
         bg.save(avatar_name)
+
         return os.path.abspath(avatar_name)

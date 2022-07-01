@@ -4,12 +4,11 @@ import os
 import socks
 import sys
 from datetime import datetime
-
 from telethon import TelegramClient
 from telethon.tl.functions.photos import (
     UploadProfilePhotoRequest, DeletePhotosRequest
 )
-
+from time import sleep
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from telegram_avatar.avatar_generator import AvatarGenerator
@@ -29,19 +28,26 @@ async def change_avatar(
         avatar_generator: AvatarGenerator object which generates
             new avatar image.
     """
-    # Deleting Telegram avatar
-    await tg_client(
-        DeletePhotosRequest(await tg_client.get_profile_photos('me'))
-    )
-    # Generating and load a new Telegram avatar
-    file = await tg_client.upload_file(
-        avatar_generator.generate()
-    )
-    # Updating Telegram avatar
-    await tg_client(
-        UploadProfilePhotoRequest(file)
-    )
-    return
+
+    for _ in range(5):
+        try:
+            # Deleting Telegram avatar
+            await tg_client(
+                DeletePhotosRequest(await tg_client.get_profile_photos('me'))
+            )
+            # Generating and load a new Telegram avatar
+            file = await tg_client.upload_file(
+                avatar_generator.generate()
+            )
+            # Updating Telegram avatar
+            await tg_client(
+                UploadProfilePhotoRequest(file)
+            )
+        except ConnectionError:
+            sleep(5)
+            continue
+        else:
+            break
 
 
 def get_logger() -> logging.Logger:
@@ -78,16 +84,23 @@ if __name__ == "__main__":
 
     # Creating an instance of TelegramClient class
     client = TelegramClient(
-        'TG_Avatar',                            # Session name
-        api_id=TELEGRAM_API_ID,                 # Telegram API ID
-        api_hash=TELEGRAM_API_HASH,             # Telegram API hash
-        proxy=proxy,                            # Proxy data
+        'TG_Avatar',                                    # Session name
+        api_id=TELEGRAM_API_ID,                         # Telegram API ID
+        api_hash=TELEGRAM_API_HASH,                     # Telegram API hash
+        proxy=proxy,                                    # Proxy data
     )
     # Starting a session
-    client.start(
-        phone=lambda: TELEGRAM_PHONE,           # Telegram phone number
-        password=lambda: TELEGRAM_PASSWORD,     # Telegram password
-    )
+    while True:
+        try:
+            client.start(
+                phone=lambda: TELEGRAM_PHONE,           # Telegram phone number
+                password=lambda: TELEGRAM_PASSWORD,     # Telegram password
+            )
+        except ConnectionError:
+            sleep(5)
+            continue
+        else:
+            break
 
     # The 'volume' through which weather data will be exchanged
     weather_data = WeatherData()
