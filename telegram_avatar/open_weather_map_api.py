@@ -1,9 +1,9 @@
-from typing import Tuple
-from logging import Logger
 import os
-
 from aiohttp import ClientSession, ClientError
+from logging import Logger
 from pydantic import ValidationError
+from typing import Tuple
+
 from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME
 from telegram_avatar.data_classes import WeatherData, OpenWeatherMap
 from telegram_avatar.exceptions import (
@@ -30,13 +30,13 @@ class OpenWeatherMapAPI:
             weather_data: the 'volume' in which weather data will be published.
             logger: logger object.
         """
+
         self._api_token = api_token
         self._api_url = api_url
         self._api_image_url = image_url_template
         self._weather_data = weather_data
         self._logger = logger
         self._client_session = ClientSession()
-        return
 
     def _weather_image_exists(self, image_name: str) -> bool:
         """
@@ -46,6 +46,7 @@ class OpenWeatherMapAPI:
         Returns:
             True if image is exist, else False.
         """
+
         img_path = os.path.join(
             os.getcwd(),
             WEATHER_ICONS_FOLDER_NAME,
@@ -53,6 +54,7 @@ class OpenWeatherMapAPI:
         )
         exists = os.path.exists(img_path)
         self._logger.info(f"Image with name {image_name} existing: {exists}")
+
         return exists
 
     async def _get_weather_image(self, image_name: str) -> None:
@@ -67,6 +69,7 @@ class OpenWeatherMapAPI:
         Returns:
             None.
         """
+
         url = self._api_image_url.format(image_name)
         self._logger.info(f"Loading image with name: {image_name}...")
         try:
@@ -90,7 +93,6 @@ class OpenWeatherMapAPI:
         with open(new_image_path, "wb") as image_file:
             image_file.write(data)
         self._logger.info(f"Saving new image ({len(data)} bytes)")
-        return
 
     async def _get_weather_data(self, city_id: int) -> Tuple[float, str]:
         """
@@ -107,6 +109,7 @@ class OpenWeatherMapAPI:
         Returns:
             tuple with current temperature and weather icon name.
         """
+
         # Necessary information for request which loading in query string
         payload = {
             "id": city_id,
@@ -148,6 +151,7 @@ class OpenWeatherMapAPI:
         new_icon = validated_response_body.weather[0].icon
         if not self._weather_image_exists(new_icon):
             await self._get_weather_image(new_icon)
+
         return new_temperature, new_icon
 
     async def update_weather_data(self, city_id: int) -> None:
@@ -159,6 +163,7 @@ class OpenWeatherMapAPI:
         Returns:
             None.
         """
+
         try:
             new_temp, new_icon = await self._get_weather_data(city_id=city_id)
             self._weather_data.current_temperature = new_temp
@@ -167,4 +172,3 @@ class OpenWeatherMapAPI:
             self._logger.exception(err)
             self._weather_data.current_temperature = None
             self._weather_data.current_weather_image = None
-        return
