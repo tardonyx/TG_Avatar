@@ -76,7 +76,7 @@ Next change variables in `.env` file and launch the container
 Telegram validation code):
 
 ```shell script
-sudo docker run --env-file .env --interactive --name tg-avatar-1 tg_avatar
+sudo docker run --restart always --env-file .env --interactive --name tg_avatar_container tg_avatar
 ```
 
 ## License ##
