@@ -13,6 +13,10 @@ Or like that if weather data is not available:
 
 ![Avatar Example No Weather](example_avatar_wo_weather.png)
 
+You can also add background GIF for animating avatar 
+(see "Customization"):
+
+![Avatar Example Animated](example_avatar_animated.gif)
 
 ## Getting Started ##
 
@@ -54,6 +58,10 @@ Also you can change text font by using another font file and changing
 path to it in `config.py` file in block "customization" in manual 
 launching mode or in `.env` file if launching in Docker.  
 Note that file must be TrueType or OpenType.  
+
+If you want to add background gif image you should place `.gif` file 
+somewhere near the project and set path to it in `config.py` file in block 
+"customization" or in `.env` file (`BG_GIF_PATH` variable).
 
 ## Launching (manual) ##
 
