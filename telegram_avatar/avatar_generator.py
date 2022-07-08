@@ -3,11 +3,11 @@
 import os
 from datetime import datetime
 from logging import Logger
-from PIL import Image, ImageDraw, ImageFont
-from typing import Union, Tuple
+from moviepy.editor import VideoFileClip
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
+from typing import Union, Tuple, Optional
 
 from telegram_avatar.data_classes import WeatherData
-from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME, FONT_FILE_NAME
 
 
 class AvatarGenerator:
@@ -20,25 +20,33 @@ class AvatarGenerator:
             self,
             weather_data: WeatherData,
             logger: Logger,
+            font_file: str,
+            image_folder: str,
             text_color: Tuple[int, int, int] = (0, 0, 0),
             bg_color: Tuple[int, int, int] = (255, 255, 255),
+            bg_gif: Optional[str] = None,
     ):
         """
         Initializer.
         Args:
             weather_data: the 'volume' in which weather data will be published.
             logger: logger object.
+            font_file: path to font file.
+            image_folder: path to folder with weather icons.
             text_color: text color in RGB format.
             bg_color: background color in RGB format.
+            bg_gif: path to background gif file.
         """
 
         self._weather_data = weather_data
         self._logger = logger
         self._text_color = text_color
         self._bg_color = bg_color
-        self._font_temperature = ImageFont.truetype(FONT_FILE_NAME, 30)
-        self._font_time = ImageFont.truetype(FONT_FILE_NAME, 50)
-        self._font_time_larger = ImageFont.truetype(FONT_FILE_NAME, 60)
+        self._folder = image_folder
+        self._font_temperature = ImageFont.truetype(font_file, 30)
+        self._font_time = ImageFont.truetype(font_file, 50)
+        self._font_time_larger = ImageFont.truetype(font_file, 60)
+        self._bg_gif = Image.open(bg_gif) if bg_gif else None
 
     @staticmethod
     def _get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -59,34 +67,27 @@ class AvatarGenerator:
 
         return result
 
-    def generate(self, avatar_name: str = "Avatar.png") -> os.path:
+    def generate(self) -> os.path:
         """
         Method which generates avatar image with time and current weather data
         or only with current time if weather data is not available.
-        Args:
-            avatar_name: the name of the file with which the generated
-                avatar will be saved.
         Returns:
             os.path object - absolute path to the generated avatar image.
         """
 
         # Create background
-        bg = Image.new(
-            mode="RGBA",
-            size=(200, 200),
-            color=self._bg_color + (255,),
-        )
+        bg_color = self._bg_color + ((0,) if self._bg_gif else (255,))
+        bg = Image.new(mode="RGBA", size=(200, 200), color=bg_color)
         canvas = ImageDraw.Draw(bg)
         # Get and format current time
         current_time = datetime.now()
         time = "{:0>2d}:{:0>2d}".format(current_time.hour, current_time.minute)
-        self._logger.info(f"Creating new avatar with name {avatar_name}...")
         # If up-to-date weather data exists
         if self._weather_data.is_up_to_date():
             # Prepare weather icon
             icon_path = os.path.join(
                 os.getcwd(),
-                WEATHER_ICONS_FOLDER_NAME,
+                self._folder,
                 self._weather_data.current_weather_image + ".png",
             )
             icon = Image.open(icon_path, "r")
@@ -119,7 +120,29 @@ class AvatarGenerator:
                 font=self._font_time_larger,
                 fill=self._text_color,
             )
-        # Saving new avatar
-        bg.save(avatar_name)
 
-        return os.path.abspath(avatar_name)
+        if self._bg_gif:
+            # Set gif if necessary
+            result_file = "avatar.mp4"
+            frames = []
+            to_frame = bg.copy()
+            for frame in ImageSequence.Iterator(self._bg_gif):
+                new_frame = frame.copy()
+                new_frame = new_frame.resize((200, 200))
+                new_frame = new_frame.convert("RGBA")
+                new_frame.alpha_composite(to_frame)
+                frames.append(new_frame)
+            frames[0].save(
+                "avatar.gif",
+                save_all=True,
+                append_images=frames[1:-1],
+            )
+            # Convert to MP4
+            clip = VideoFileClip("avatar.gif")
+            clip.write_videofile(result_file, logger=None, audio=False)
+        else:
+            # Saving new avatar
+            result_file = "avatar.png"
+            bg.save(result_file)
+
+        return os.path.abspath(result_file)
