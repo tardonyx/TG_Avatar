@@ -33,7 +33,10 @@ OPENWEATHER_API_IMAGE_URL = environ.get(
 # Customization
 __bg_color = environ.get("TG_AVATAR_COLOR_BACKGROUND", "255,255,255")
 BACKGROUND_COLOR = tuple([int(n) for n in __bg_color.split(',')])
-__text_color = environ.get("TG_AVATAR_COLOR_TEXT", "0,0,0")
+__text_color = environ.get("TG_AVATAR_COLOR_TEXT", "255,255,255")
 TEXT_COLOR = tuple([int(n) for n in __text_color.split(',')])
 # Font for the text drawing on avatar
 FONT_FILE_NAME = environ.get("FONT_FILE_NAME", "OpenSans-Regular.ttf")
+# BG gif if exists
+BG_GIF_PATH = environ.get("BG_GIF_PATH", "bg_gif.gif")
+TIME_ZONE = environ.get("TIME_ZONE", "Europe/Moscow")
