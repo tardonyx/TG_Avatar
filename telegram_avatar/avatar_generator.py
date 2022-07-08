@@ -3,8 +3,8 @@
 import os
 from datetime import datetime
 from logging import Logger
-from PIL import Image, ImageDraw, ImageFont
-from typing import Union, Tuple
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
+from typing import Union, Tuple, Optional
 
 from telegram_avatar.data_classes import WeatherData
 
@@ -23,6 +23,8 @@ class AvatarGenerator:
             image_folder: str,
             text_color: Tuple[int, int, int] = (0, 0, 0),
             bg_color: Tuple[int, int, int] = (255, 255, 255),
+            bg_gif: Optional[str] = None,
+            result_file_name: str = "Avatar.png",
     ):
         """
         Initializer.
@@ -33,6 +35,8 @@ class AvatarGenerator:
             image_folder: path to folder with weather icons.
             text_color: text color in RGB format.
             bg_color: background color in RGB format.
+            bg_gif: path to background gif file.
+            result_file_name: name of resulting file.
         """
 
         self._weather_data = weather_data
@@ -43,6 +47,8 @@ class AvatarGenerator:
         self._font_temperature = ImageFont.truetype(font_file, 30)
         self._font_time = ImageFont.truetype(font_file, 50)
         self._font_time_larger = ImageFont.truetype(font_file, 60)
+        self._bg_gif = Image.open(bg_gif) if bg_gif else None
+        self._result_file_name = result_file_name
 
     @staticmethod
     def _get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -63,28 +69,24 @@ class AvatarGenerator:
 
         return result
 
-    def generate(self, avatar_name: str = "Avatar.png") -> os.path:
+    def generate(self) -> os.path:
         """
         Method which generates avatar image with time and current weather data
         or only with current time if weather data is not available.
-        Args:
-            avatar_name: the name of the file with which the generated
-                avatar will be saved.
         Returns:
             os.path object - absolute path to the generated avatar image.
         """
 
         # Create background
-        bg = Image.new(
-            mode="RGBA",
-            size=(200, 200),
-            color=self._bg_color + (255,),
-        )
+        bg_color = self._bg_color + ((0,) if self._bg_gif else (255,))
+        bg = Image.new(mode="RGBA", size=(200, 200), color=bg_color)
         canvas = ImageDraw.Draw(bg)
         # Get and format current time
         current_time = datetime.now()
         time = "{:0>2d}:{:0>2d}".format(current_time.hour, current_time.minute)
-        self._logger.info(f"Creating new avatar with name {avatar_name}...")
+        self._logger.info(
+            f"Creating new avatar with name {self._result_file_name}..."
+        )
         # If up-to-date weather data exists
         if self._weather_data.is_up_to_date():
             # Prepare weather icon
@@ -123,10 +125,27 @@ class AvatarGenerator:
                 font=self._font_time_larger,
                 fill=self._text_color,
             )
-        # Saving new avatar
-        bg.save(avatar_name)
 
-        return os.path.abspath(avatar_name)
+        if self._bg_gif:
+            # Set gif if necessary
+            frames = []
+            to_frame = bg.copy()
+            for frame in ImageSequence.Iterator(self._bg_gif):
+                new_frame = frame.copy()
+                new_frame = new_frame.resize((200, 200))
+                new_frame = new_frame.convert("RGBA")
+                new_frame.alpha_composite(to_frame)
+                frames.append(new_frame)
+            frames[0].save(
+                self._result_file_name,
+                save_all=True,
+                append_images=frames[1:-1],
+            )
+        else:
+            # Saving new avatar
+            bg.save(self._result_file_name)
+
+        return os.path.abspath(self._result_file_name)
 
 
 if __name__ == "__main__":
@@ -135,15 +154,17 @@ if __name__ == "__main__":
 
     weather_data = WeatherData(
         current_temperature=22,
-        current_weather_image="01d",
+        current_weather_image="04d",
     )
 
     generator = AvatarGenerator(
         weather_data=weather_data,
-        text_color=(0, 0, 0),
+        text_color=(255, 255, 255),
         bg_color=(255, 255, 255),
+        bg_gif="/Users/a19116473/Projects/TG_Avatar/bg_gif.gif",
         font_file="/Users/a19116473/Projects/TG_Avatar/OpenSans-Regular.ttf",
         image_folder="/Users/a19116473/Projects/TG_Avatar/API_Icons",
+        result_file_name="Avatar.gif",
         logger=getLogger(),
     )
 

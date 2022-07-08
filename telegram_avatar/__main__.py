@@ -112,6 +112,8 @@ if __name__ == "__main__":
         font_file=FONT_FILE_NAME,
         image_folder=WEATHER_ICONS_FOLDER_NAME,
         bg_color=BACKGROUND_COLOR,
+        bg_gif=BG_GIF_PATH,
+        result_file_name="Avatar.gif",
         logger=logger,
     )
 
