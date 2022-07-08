@@ -146,25 +146,3 @@ class AvatarGenerator:
             bg.save(result_file)
 
         return os.path.abspath(result_file)
-
-
-if __name__ == "__main__":
-
-    from logging import getLogger
-
-    weather_data = WeatherData(
-        current_temperature=22,
-        current_weather_image="04d",
-    )
-
-    generator = AvatarGenerator(
-        weather_data=weather_data,
-        text_color=(255, 255, 255),
-        bg_color=(255, 255, 255),
-        bg_gif="/Users/a19116473/Projects/TG_Avatar/bg_gif.gif",
-        font_file="/Users/a19116473/Projects/TG_Avatar/OpenSans-Regular.ttf",
-        image_folder="/Users/a19116473/Projects/TG_Avatar/API_Icons",
-        logger=getLogger(),
-    )
-
-    generator.generate()
