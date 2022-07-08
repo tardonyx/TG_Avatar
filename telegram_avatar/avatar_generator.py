@@ -139,7 +139,7 @@ class AvatarGenerator:
             )
             # Convert to MP4
             clip = VideoFileClip("avatar.gif")
-            clip.write_videofile(result_file, logger=None)
+            clip.write_videofile(result_file, logger=None, audio=False)
         else:
             # Saving new avatar
             result_file = "avatar.png"
