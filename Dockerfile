@@ -2,8 +2,6 @@ FROM python:3.8-buster
 
 LABEL maintainer="andreybibea@gmail.com"
 
-ENV TZ=Europe/Moscow
-
 WORKDIR /tg_avatar
 
 COPY requirements.txt .
