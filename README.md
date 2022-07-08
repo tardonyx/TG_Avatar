@@ -50,6 +50,8 @@ pip install -r requirements.txt
 
 ## Customization ##
 
+### Colors
+
 You can set text and background color by changing corresponds values 
 in `config.py` file in block "customization" in manual launching mode or 
 in `.env` file if launching in Docker.  
@@ -59,9 +61,18 @@ path to it in `config.py` file in block "customization" in manual
 launching mode or in `.env` file if launching in Docker.  
 Note that file must be TrueType or OpenType.  
 
+### Animation
+
 If you want to add background gif image you should place `.gif` file 
 somewhere near the project and set path to it in `config.py` file in block 
 "customization" or in `.env` file (`BG_GIF_PATH` variable).
+
+### Time Zone
+
+You should manually set time zone by changing value in `config.py` 
+or in `.env` files (`TIME_ZONE` variable). List of all time zones you
+can found 
+[here](https://gist.github.com/heyalexej/8bf688fd67d7199be4a1682b3eec7568).
 
 ## Launching (manual) ##
 
