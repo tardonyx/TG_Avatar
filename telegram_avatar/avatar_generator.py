@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import Union, Tuple
 
 from telegram_avatar.data_classes import WeatherData
-from telegram_avatar.config import WEATHER_ICONS_FOLDER_NAME, FONT_FILE_NAME
 
 
 class AvatarGenerator:
@@ -20,6 +19,8 @@ class AvatarGenerator:
             self,
             weather_data: WeatherData,
             logger: Logger,
+            font_file: str,
+            image_folder: str,
             text_color: Tuple[int, int, int] = (0, 0, 0),
             bg_color: Tuple[int, int, int] = (255, 255, 255),
     ):
@@ -28,6 +29,8 @@ class AvatarGenerator:
         Args:
             weather_data: the 'volume' in which weather data will be published.
             logger: logger object.
+            font_file: path to font file.
+            image_folder: path to folder with weather icons.
             text_color: text color in RGB format.
             bg_color: background color in RGB format.
         """
@@ -36,9 +39,10 @@ class AvatarGenerator:
         self._logger = logger
         self._text_color = text_color
         self._bg_color = bg_color
-        self._font_temperature = ImageFont.truetype(FONT_FILE_NAME, 30)
-        self._font_time = ImageFont.truetype(FONT_FILE_NAME, 50)
-        self._font_time_larger = ImageFont.truetype(FONT_FILE_NAME, 60)
+        self._folder = image_folder
+        self._font_temperature = ImageFont.truetype(font_file, 30)
+        self._font_time = ImageFont.truetype(font_file, 50)
+        self._font_time_larger = ImageFont.truetype(font_file, 60)
 
     @staticmethod
     def _get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -86,7 +90,7 @@ class AvatarGenerator:
             # Prepare weather icon
             icon_path = os.path.join(
                 os.getcwd(),
-                WEATHER_ICONS_FOLDER_NAME,
+                self._folder,
                 self._weather_data.current_weather_image + ".png",
             )
             icon = Image.open(icon_path, "r")
@@ -123,3 +127,24 @@ class AvatarGenerator:
         bg.save(avatar_name)
 
         return os.path.abspath(avatar_name)
+
+
+if __name__ == "__main__":
+
+    from logging import getLogger
+
+    weather_data = WeatherData(
+        current_temperature=22,
+        current_weather_image="01d",
+    )
+
+    generator = AvatarGenerator(
+        weather_data=weather_data,
+        text_color=(0, 0, 0),
+        bg_color=(255, 255, 255),
+        font_file="/Users/a19116473/Projects/TG_Avatar/OpenSans-Regular.ttf",
+        image_folder="/Users/a19116473/Projects/TG_Avatar/API_Icons",
+        logger=getLogger(),
+    )
+
+    generator.generate()

@@ -109,6 +109,8 @@ if __name__ == "__main__":
     generator = AvatarGenerator(
         weather_data=weather_data,
         text_color=TEXT_COLOR,
+        font_file=FONT_FILE_NAME,
+        image_folder=WEATHER_ICONS_FOLDER_NAME,
         bg_color=BACKGROUND_COLOR,
         logger=logger,
     )
