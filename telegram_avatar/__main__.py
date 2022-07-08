@@ -8,7 +8,7 @@ from telethon import TelegramClient
 from telethon.tl.functions.photos import (
     UploadProfilePhotoRequest, DeletePhotosRequest
 )
-from time import sleep
+from time import sleep, tzset
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from telegram_avatar.avatar_generator import AvatarGenerator
@@ -72,6 +72,10 @@ if __name__ == "__main__":
 
     # Get logger
     logger = get_logger()
+
+    # Set timezone
+    os.environ["TZ"] = TIME_ZONE
+    tzset()
 
     # Create folder for weather images if not exists
     if not os.path.exists(WEATHER_ICONS_FOLDER_NAME):
