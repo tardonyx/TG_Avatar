@@ -3,6 +3,7 @@
 import os
 from datetime import datetime
 from logging import Logger
+from moviepy.editor import VideoFileClip
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 from typing import Union, Tuple, Optional
 
@@ -24,7 +25,6 @@ class AvatarGenerator:
             text_color: Tuple[int, int, int] = (0, 0, 0),
             bg_color: Tuple[int, int, int] = (255, 255, 255),
             bg_gif: Optional[str] = None,
-            result_file_name: str = "Avatar.png",
     ):
         """
         Initializer.
@@ -36,7 +36,6 @@ class AvatarGenerator:
             text_color: text color in RGB format.
             bg_color: background color in RGB format.
             bg_gif: path to background gif file.
-            result_file_name: name of resulting file.
         """
 
         self._weather_data = weather_data
@@ -48,7 +47,6 @@ class AvatarGenerator:
         self._font_time = ImageFont.truetype(font_file, 50)
         self._font_time_larger = ImageFont.truetype(font_file, 60)
         self._bg_gif = Image.open(bg_gif) if bg_gif else None
-        self._result_file_name = result_file_name
 
     @staticmethod
     def _get_celsius_from_kelvin(t_kelvin: Union[int, float, str]) -> str:
@@ -84,9 +82,6 @@ class AvatarGenerator:
         # Get and format current time
         current_time = datetime.now()
         time = "{:0>2d}:{:0>2d}".format(current_time.hour, current_time.minute)
-        self._logger.info(
-            f"Creating new avatar with name {self._result_file_name}..."
-        )
         # If up-to-date weather data exists
         if self._weather_data.is_up_to_date():
             # Prepare weather icon
@@ -128,6 +123,7 @@ class AvatarGenerator:
 
         if self._bg_gif:
             # Set gif if necessary
+            result_file = "avatar.mp4"
             frames = []
             to_frame = bg.copy()
             for frame in ImageSequence.Iterator(self._bg_gif):
@@ -137,15 +133,19 @@ class AvatarGenerator:
                 new_frame.alpha_composite(to_frame)
                 frames.append(new_frame)
             frames[0].save(
-                self._result_file_name,
+                "avatar.gif",
                 save_all=True,
                 append_images=frames[1:-1],
             )
+            # Convert to MP4
+            clip = VideoFileClip("avatar.gif")
+            clip.write_videofile(result_file, logger=None)
         else:
             # Saving new avatar
-            bg.save(self._result_file_name)
+            result_file = "avatar.png"
+            bg.save(result_file)
 
-        return os.path.abspath(self._result_file_name)
+        return os.path.abspath(result_file)
 
 
 if __name__ == "__main__":
@@ -164,7 +164,6 @@ if __name__ == "__main__":
         bg_gif="/Users/a19116473/Projects/TG_Avatar/bg_gif.gif",
         font_file="/Users/a19116473/Projects/TG_Avatar/OpenSans-Regular.ttf",
         image_folder="/Users/a19116473/Projects/TG_Avatar/API_Icons",
-        result_file_name="Avatar.gif",
         logger=getLogger(),
     )
 

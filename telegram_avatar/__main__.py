@@ -20,6 +20,7 @@ from telegram_avatar.config import *
 async def change_avatar(
         tg_client: TelegramClient,
         avatar_generator: AvatarGenerator,
+        animated: bool = False,
 ) -> None:
     """
     Function which updates Telegram avatar with generated new one.
@@ -27,6 +28,7 @@ async def change_avatar(
         tg_client: authorised telethon.TelegramClient object.
         avatar_generator: AvatarGenerator object which generates
             new avatar image.
+        animated: set True if file is video or animation.
     """
 
     for _ in range(5):
@@ -40,8 +42,9 @@ async def change_avatar(
                 avatar_generator.generate()
             )
             # Updating Telegram avatar
+            key = "video" if animated else "file"
             await tg_client(
-                UploadProfilePhotoRequest(file)
+                UploadProfilePhotoRequest(**{key: file})
             )
         except ConnectionError:
             sleep(5)
@@ -113,7 +116,6 @@ if __name__ == "__main__":
         image_folder=WEATHER_ICONS_FOLDER_NAME,
         bg_color=BACKGROUND_COLOR,
         bg_gif=BG_GIF_PATH,
-        result_file_name="Avatar.gif",
         logger=logger,
     )
 
@@ -130,9 +132,10 @@ if __name__ == "__main__":
     scheduler = AsyncIOScheduler()
 
     # Adding a job which updating avatar every beginning of a minute
+    animated_avatar = bool(BG_GIF_PATH)
     scheduler.add_job(
         change_avatar,
-        args=(client, generator),
+        args=(client, generator, animated_avatar),
         next_run_time=datetime.now(),
         trigger='cron',
         minute='*',
